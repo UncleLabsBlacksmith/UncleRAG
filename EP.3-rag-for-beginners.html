@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RAG for Beginners — Dark Online Class (30 Slides)</title>
+<style>
+:root{
+  --bg:#070b14;
+  --panel:#0d1320;
+  --panel2:#111a2b;
+  --text:#f7f9fc;
+  --muted:#a7b0c0;
+  --line:#22304a;
+  --violet:#8b5cf6;
+  --cyan:#22d3ee;
+  --green:#34d399;
+  --orange:#fb923c;
+  --pink:#f472b6;
+  --yellow:#facc15;
+  --red:#fb7185;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,"Noto Sans Thai","Segoe UI",Tahoma,sans-serif;overflow:hidden}
+body{background:
+  radial-gradient(circle at 80% 10%,rgba(139,92,246,.16),transparent 26%),
+  radial-gradient(circle at 12% 92%,rgba(34,211,238,.10),transparent 28%),
+  var(--bg)}
+.deck{width:100%;height:100%;display:flex;flex-direction:column}
+.topbar{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(7,11,20,.82);backdrop-filter:blur(12px);z-index:20}
+.brand{font-weight:900;letter-spacing:.3px}.brand b{color:var(--cyan)}
+.counter{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stage{flex:1;display:grid;place-items:center;padding:16px}
+.slide{display:none;width:min(1280px,96vw);aspect-ratio:16/9;max-height:calc(100vh - 142px);background:linear-gradient(145deg,rgba(17,26,43,.98),rgba(8,13,24,.98));border:1px solid rgba(255,255,255,.09);border-radius:26px;box-shadow:0 26px 80px rgba(0,0,0,.42);padding:48px 58px;position:relative;overflow:hidden}
+.slide::after{content:"";position:absolute;inset:auto -100px -150px auto;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,.08),transparent 68%);pointer-events:none}
+.slide.active{display:block;animation:in .22s ease}
+@keyframes in{from{opacity:.25;transform:scale(.992) translateY(6px)}to{opacity:1;transform:none}}
+h1,h2,h3,p{margin-top:0}h1{font-size:62px;line-height:1.04;letter-spacing:-2px;margin-bottom:18px}h2{font-size:42px;line-height:1.12;letter-spacing:-1px;margin-bottom:24px}h3{font-size:22px;margin-bottom:8px}p,li{font-size:21px;line-height:1.52}.lead{font-size:28px;line-height:1.5;color:var(--muted);max-width:1000px}.small{font-size:17px;color:var(--muted)}.tiny{font-size:13px;color:var(--muted)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;border:1px solid rgba(34,211,238,.25);background:rgba(34,211,238,.08);color:#8be9f7;font-size:13px;font-weight:900;letter-spacing:.8px;margin-bottom:18px;text-transform:uppercase}
+.accent{color:var(--cyan)}.violet{color:#b7a0ff}.green{color:#70e6bc}.orange{color:#ffb27a}.pink{color:#ff9ed0}.yellow{color:#ffe266}.muted{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:linear-gradient(180deg,rgba(20,31,52,.95),rgba(13,20,34,.95));border:1px solid var(--line);border-radius:18px;padding:20px;min-height:128px}.card strong{display:block;font-size:21px;margin-bottom:7px}.card p{font-size:17px;color:var(--muted);margin:0;line-height:1.5}
+.big{background:rgba(11,18,31,.72);border:1px solid #273855;border-radius:22px;padding:24px}.callout{border-left:4px solid var(--cyan);background:rgba(34,211,238,.07);padding:16px 18px;border-radius:0 16px 16px 0;font-size:21px}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.node{padding:12px 15px;border:1px solid #2b3b5a;border-radius:13px;background:#0e1728;font-weight:850;font-size:17px}.node.hot{border-color:rgba(139,92,246,.6);background:rgba(139,92,246,.12);color:#d8ccff}.node.cyan{border-color:rgba(34,211,238,.55);background:rgba(34,211,238,.10);color:#a6f0fa}.arr{font-size:25px;color:#61708a}
+.term{display:flex;gap:14px;align-items:flex-start}.term .icon{width:48px;height:48px;flex:0 0 48px;border-radius:14px;display:grid;place-items:center;background:rgba(139,92,246,.13);border:1px solid rgba(139,92,246,.28);font-size:25px}.term p{font-size:17px;color:var(--muted);margin:0}
+.quote{font-size:36px;font-weight:900;line-height:1.35;max-width:1050px}.quote em{font-style:normal;color:var(--cyan)}
+.code{background:#050811;border:1px solid #1e2a40;border-radius:17px;padding:18px 20px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;line-height:1.55;color:#dce4f2;white-space:pre-wrap}.code .c{color:#6f7c92}.code .k{color:#c4b5fd}.code .s{color:#86efac}
+.pill{display:inline-block;padding:6px 9px;border-radius:999px;background:#111c2f;border:1px solid #2a3b59;color:#c9d3e4;font-size:14px;font-weight:800;margin:3px 4px 0 0}
+.example-label{font-size:13px;font-weight:900;color:#8be9f7;letter-spacing:.6px;margin-bottom:8px}
+.num{font-size:50px;font-weight:950;line-height:1;color:#4338ca;background:linear-gradient(180deg,#c4b5fd,#8b5cf6);-webkit-background-clip:text;color:transparent}.step{display:grid;grid-template-columns:62px 1fr;gap:12px;align-items:start;margin:11px 0}.step p{font-size:18px;color:var(--muted);margin:0}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:20px}.side{padding:20px;border-radius:19px;border:1px solid var(--line);background:#0d1627}.side.good{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.06)}
+.map{position:relative;height:390px;border-radius:24px;background:
+  linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px),#09101d;background-size:42px 42px;border:1px solid #20304b;overflow:hidden}
+.dot{position:absolute;width:18px;height:18px;border-radius:50%;box-shadow:0 0 0 7px rgba(255,255,255,.03)}.dot::after{content:attr(data-label);position:absolute;left:24px;top:-4px;font-size:14px;font-weight:850;white-space:nowrap}.d1{background:var(--cyan);left:21%;top:28%}.d2{background:#5eead4;left:27%;top:38%}.d3{background:#67e8f9;left:33%;top:30%}.d4{background:var(--orange);left:72%;top:65%}.d5{background:var(--pink);left:70%;top:23%}.d6{background:var(--yellow);left:58%;top:72%}
+.gps{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}.gps-screen{height:380px;border-radius:26px;border:1px solid #2a3c5d;background:linear-gradient(145deg,#0c1c2d,#09111f);position:relative;overflow:hidden}.road{position:absolute;width:120%;height:18px;background:#263b56;border-radius:999px;transform:rotate(-18deg);left:-10%;top:48%}.road::after{content:"";position:absolute;left:0;right:0;top:7px;border-top:2px dashed #70849e}.pin{position:absolute;width:28px;height:28px;border-radius:50% 50% 50% 0;background:var(--pink);transform:rotate(-45deg);left:24%;top:26%}.pin::after{content:"";position:absolute;width:9px;height:9px;background:#fff;border-radius:50%;left:9px;top:9px}.pin2{left:70%;top:62%;background:var(--cyan)}.route{position:absolute;left:30%;top:38%;width:42%;height:33%;border:4px solid var(--violet);border-left-color:transparent;border-bottom-color:transparent;border-radius:50%;transform:rotate(20deg)}
+.metric{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:15px;padding:12px 14px;margin:8px 0;background:#0b1423}.metric b{font-size:17px}.score{font-size:20px;color:#a7f3d0;font-weight:900}
+.footer-note{position:absolute;bottom:22px;left:58px;font-size:13px;color:#64738c}.slide-no{position:absolute;right:30px;bottom:21px;font-size:12px;color:#4d5c74}
+.controls{height:72px;display:flex;align-items:center;justify-content:center;gap:12px}.btn{border:1px solid #263652;background:#0f1829;color:#e9eef7;border-radius:12px;padding:9px 14px;font-weight:850;cursor:pointer}.btn:hover{border-color:#3f5275}.btn.primary{background:linear-gradient(135deg,#7c3aed,#4f46e5);border-color:#7c3aed}.progress{height:5px;width:min(660px,54vw);background:#172238;border-radius:999px;overflow:hidden}.bar{height:100%;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:width .18s ease}.kbd{padding:2px 5px;border:1px solid #34435f;border-bottom-width:2px;border-radius:5px;background:#0c1422;font-size:11px}
+.legend{display:flex;gap:16px;flex-wrap:wrap}.legend span{font-size:14px;color:var(--muted)}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+@media(max-width:900px){.slide{padding:30px 32px;max-height:calc(100vh - 132px);overflow:auto}h1{font-size:44px}h2{font-size:34px}.lead{font-size:23px}.grid3,.grid4{grid-template-columns:1fr 1fr}.grid2,.compare,.gps{grid-template-columns:1fr}.map,.gps-screen{height:300px}.footer-note{left:32px}.controls .tiny{display:none}}
+</style>
+</head>
+<body>
+<div class="deck">
+  <header class="topbar"><div class="brand">RAG <b>for Beginners</b> · Dark Classroom</div><div class="counter"><span id="cur">1</span> / <span id="tot">30</span></div></header>
+  <main class="stage">
+
+<section class="slide active">
+  <div class="eyebrow">RAG 101 · Beginner</div>
+  <h1>RAG คืออะไร?<br><span class="accent">สอนแบบเห็นภาพ</span> ไม่ต้องเริ่มจากคณิตศาสตร์</h1>
+  <p class="lead">จาก “AI ตอบจากความจำ” → “AI เปิดตำราก่อนตอบ” พร้อมภาพเปรียบเทียบ Embedding, Vector และ Vector Database แบบ GPS</p>
+  <div class="flow" style="margin-top:26px"><div class="node">เอกสาร</div><div class="arr">→</div><div class="node hot">ค้นความหมาย</div><div class="arr">→</div><div class="node cyan">LLM ตอบ</div></div>
+  <div class="footer-note">ออกแบบสำหรับสอนออนไลน์: ตัวใหญ่ · คอนทราสต์สูง · 16:9</div><div class="slide-no">01</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">RAG = WHAT?</div>
+  <h2>คำว่า <span class="accent">RAG</span> ย่อมาจากอะไร?</h2>
+  <div class="grid3">
+    <div class="card"><strong class="cyan">R = Retrieval</strong><p>“ค้นหา” ข้อมูลที่เกี่ยวข้องกับคำถามจากเอกสารหรือฐานความรู้</p></div>
+    <div class="card"><strong class="violet">A = Augmented</strong><p>“เติมข้อมูลให้” LLM ก่อนตอบ เหมือนยื่นโพยหรือหน้าหนังสือที่เกี่ยวข้องให้ดู</p></div>
+    <div class="card"><strong class="green">G = Generation</strong><p>“สร้างคำตอบ” โดยให้ LLM อ่านข้อมูลที่ค้นมาแล้วเรียบเรียงเป็นภาษาคน</p></div>
+  </div>
+  <div class="callout" style="margin-top:26px"><b>สูตรจำง่าย:</b> RAG = <b>ค้นหา → เอาข้อมูลมาให้ AI อ่าน → แล้วค่อยตอบ</b></div>
+  <div class="slide-no">02</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">ง่ายที่สุด</div>
+  <h2>RAG เหมือน “เด็กเปิดหนังสือก่อนตอบครู”</h2>
+  <div class="compare">
+    <div class="side"><h3>🙈 ไม่มี RAG</h3><p>ครูถาม: “ดาวเคราะห์ดวงไหนใหญ่ที่สุด?”</p><div class="big"><p style="margin:0">เด็กตอบจาก <b>ความจำ</b> — จำได้ก็ตอบถูก จำผิดก็มีโอกาสตอบผิด</p></div></div>
+    <div class="side good"><h3>📖 มี RAG</h3><p>ครูถามคำถามเดิม</p><div class="big"><p style="margin:0">เด็ก <b>เปิดหนังสือ → หาหน้าที่เกี่ยวข้อง → อ่าน → ตอบ</b></p></div></div>
+  </div>
+  <p class="quote" style="font-size:30px;margin-top:28px">RAG ไม่ได้ทำให้เด็ก “จำเก่งขึ้น” แต่ทำให้เด็ก <em>มีหนังสือให้เปิดก่อนตอบ</em></p>
+  <div class="slide-no">03</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">ตัวอย่างชีวิตประจำวัน</div>
+  <h2>ตัวอย่าง: AI ตอบคำถามจาก “คู่มือร้านกาแฟ”</h2>
+  <div class="flow" style="margin-top:26px">
+    <div class="node">☕ คู่มือร้าน</div><div class="arr">→</div><div class="node hot">🔎 ค้นหัวข้อที่เกี่ยวข้อง</div><div class="arr">→</div><div class="node cyan">🤖 AI อ่าน</div><div class="arr">→</div><div class="node">💬 ตอบพนักงาน</div>
+  </div>
+  <div class="grid2" style="margin-top:30px">
+    <div class="big"><div class="example-label">พนักงานถาม</div><p style="font-size:27px;margin-bottom:0">“ถ้าลูกค้าขอเปลี่ยนนมเป็น Oat Milk คิดเพิ่มเท่าไร?”</p></div>
+    <div class="big"><div class="example-label">RAG ทำอะไร</div><p style="margin-bottom:0">ค้นเฉพาะหน้าที่เขียนเรื่อง <b>ราคาเครื่องดื่มและตัวเลือกนม</b> แล้วส่งส่วนนั้นให้ AI ตอบ</p></div>
+  </div>
+  <div class="slide-no">04</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">ตัวอย่างในบริษัท</div>
+  <h2>ตัวอย่าง: พนักงานใหม่ถาม “ลากิจได้กี่วัน?”</h2>
+  <div class="grid2">
+    <div><p class="lead">บริษัทมี Employee Handbook 120 หน้า</p><div class="big"><p>เราไม่จำเป็นต้องส่ง 120 หน้าให้ AI ทุกครั้ง</p><p style="margin-bottom:0">RAG จะค้นเฉพาะหัวข้อ <b>Leave Policy / ลากิจ / วันลา</b></p></div></div>
+    <div><div class="step"><div class="num">1</div><div><h3>ถาม</h3><p>“พนักงานลากิจได้กี่วัน?”</p></div></div><div class="step"><div class="num">2</div><div><h3>ค้น</h3><p>หา Chunk ที่พูดเรื่องลากิจ</p></div></div><div class="step"><div class="num">3</div><div><h3>ตอบ</h3><p>LLM อ่าน Chunk นั้น แล้วตอบพร้อมอ้างอิงเอกสาร</p></div></div></div>
+  </div>
+  <div class="slide-no">05</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">ตัวอย่างที่เราจะใช้ทั้งคลาส</div>
+  <h2>ตัวอย่าง: คู่มือ <span class="accent">3D Printer</span></h2>
+  <div class="big"><div class="example-label">สถานการณ์</div><p style="font-size:28px">เรามีคู่มือ 200 หน้า และผู้ใช้ถามว่า<br><b>“Nozzle อุดตัน ต้องทำอย่างไร?”</b></p></div>
+  <div class="flow" style="margin-top:26px">
+    <div class="node">📘 คู่มือ 200 หน้า</div><div class="arr">→</div><div class="node hot">✂️ แบ่งเป็น Chunk</div><div class="arr">→</div><div class="node hot">🔎 หาชิ้นที่เกี่ยวกับ Nozzle</div><div class="arr">→</div><div class="node cyan">🤖 LLM อ่านแล้วตอบ</div>
+  </div>
+  <div class="callout" style="margin-top:26px"><b>นี่คือ RAG:</b> AI ไม่ต้องจำคู่มือทั้งเล่ม แต่ต้อง “หาเนื้อหาที่ใช่ให้เจอ” ก่อนตอบ</div>
+  <div class="slide-no">06</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Learning Goals</div><h2>จบ 30 สไลด์นี้ นักเรียนควรเข้าใจอะไร?</h2>
+  <div class="grid2">
+    <div class="card"><strong>1. RAG คืออะไร</strong><p>อธิบายได้ด้วยคำง่าย ๆ ว่า “ค้นก่อน แล้วค่อยตอบ”</p></div>
+    <div class="card"><strong>2. Embedding / Vector ต่างกันอย่างไร</strong><p>Embedding = วิธีแปลงความหมายเป็นพิกัด · Vector = พิกัดที่ได้</p></div>
+    <div class="card"><strong>3. Vector Database ทำอะไร</strong><p>ค้นหาพิกัดที่อยู่ใกล้กัน เหมือนระบบ GPS หา “จุดใกล้เคียง”</p></div>
+    <div class="card"><strong>4. Python ต่อทุกอย่างอย่างไร</strong><p>เห็น Workflow ตั้งแต่ PDF → Chunk → Search → LLM</p></div>
+  </div><div class="slide-no">02</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">The Problem</div><h2>ก่อนรู้จัก RAG ให้เข้าใจปัญหาก่อน</h2>
+  <p class="quote">LLM เหมือน <em>คนเก่งที่อ่านหนังสือมาเยอะ</em> แต่ไม่ได้ถือเอกสารของบริษัทเราอยู่ในมือ</p>
+  <div class="grid3" style="margin-top:24px">
+    <div class="card"><strong>📚 ความรู้ทั่วไป</strong><p>มีเยอะ แต่ไม่ได้ครอบคลุมข้อมูลเฉพาะของเราเสมอ</p></div>
+    <div class="card"><strong>🕒 ข้อมูลเปลี่ยนได้</strong><p>คู่มือ ราคา ขั้นตอน หรือข้อมูลภายในอาจอัปเดต</p></div>
+    <div class="card"><strong>🎲 อาจเดา</strong><p>ถ้าไม่มีข้อมูลพอ LLM อาจตอบดูน่าเชื่อแต่ผิด</p></div>
+  </div><div class="footer-note">คำศัพท์: Hallucination = AI สร้างคำตอบที่ดูจริง แต่ข้อมูลอาจไม่จริง</div><div class="slide-no">03</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Big Idea</div><h2>RAG = ให้ AI <span class="accent">เปิดตำราก่อนตอบ</span></h2>
+  <div class="grid2">
+    <div class="big"><div class="example-label">ไม่มี RAG</div><p style="font-size:25px">ถามเพื่อนจากความจำ</p><p class="muted">“จำได้ไหมว่าในคู่มือบอกอะไร?”</p><div class="callout">เพื่อนอาจจำถูก… หรือเดา</div></div>
+    <div class="big"><div class="example-label">มี RAG</div><p style="font-size:25px">ให้เพื่อนไปเปิดหนังสือก่อน</p><p class="muted">ค้นหน้าที่เกี่ยวข้อง → อ่าน → ค่อยตอบ</p><div class="callout">คำตอบมี “หลักฐาน” จากเอกสารของเรา</div></div>
+  </div>
+  <p class="lead" style="margin-top:22px"><b>RAG = Retrieval-Augmented Generation</b> → “ดึงข้อมูลมาเสริมก่อนสร้างคำตอบ”</p><div class="slide-no">04</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Workflow</div><h2>RAG มี 2 ช่วงใหญ่ ๆ</h2>
+  <div class="grid2">
+    <div class="side"><h3 class="violet">A. เตรียมคลังความรู้</h3><div class="flow" style="margin-top:18px"><div class="node">PDF</div><div class="arr">→</div><div class="node">Chunk</div><div class="arr">→</div><div class="node hot">Embedding</div><div class="arr">→</div><div class="node">Vector DB</div></div><p class="small" style="margin-top:20px">ทำเมื่อเพิ่ม/แก้เอกสาร</p></div>
+    <div class="side good"><h3 class="green">B. ตอนผู้ใช้ถาม</h3><div class="flow" style="margin-top:18px"><div class="node">Question</div><div class="arr">→</div><div class="node hot">Search</div><div class="arr">→</div><div class="node">Context</div><div class="arr">→</div><div class="node cyan">LLM</div></div><p class="small" style="margin-top:20px">เกิดทุกครั้งที่มีคำถาม</p></div>
+  </div><div class="footer-note">จำง่าย: “สร้างห้องสมุด” ก่อน แล้วค่อย “ถามบรรณารักษ์”</div><div class="slide-no">05</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Step 1 · Documents</div><h2>เอกสาร = หนังสือในห้องสมุดของเรา</h2>
+  <div class="grid3">
+    <div class="card"><strong>📄 PDF</strong><p>คู่มือเครื่อง เอกสารอบรม SOP ใบสเปก</p></div>
+    <div class="card"><strong>📝 Word / Text</strong><p>FAQ ขั้นตอนงาน บันทึกภายใน</p></div>
+    <div class="card"><strong>🗃️ Database / Web</strong><p>ข้อมูลจากระบบหรือหน้าเว็บที่เราอนุญาต</p></div>
+  </div>
+  <div class="big" style="margin-top:22px"><div class="example-label">ตัวอย่างที่ใช้ทั้งบท</div><p style="margin:0;font-size:24px">เรามี <b>คู่มือ 3D Printer 200 หน้า</b> และอยากให้ AI ตอบคำถามจากคู่มือนี้</p></div><div class="slide-no">06</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Step 2 · Chunk</div><h2>Chunk = ฉีกหนังสือเป็น “บัตรคำ” ที่ค้นง่าย</h2>
+  <div class="grid2">
+    <div><p class="lead">เราไม่ส่ง PDF 200 หน้าให้ LLM ทุกครั้ง แต่แบ่งเป็นชิ้นเล็ก ๆ</p><div class="flow" style="margin-top:20px"><div class="node">หน้า 1–200</div><div class="arr">→</div><div class="node hot">Chunk A</div><div class="node hot">Chunk B</div><div class="node hot">Chunk C</div><div class="node">…</div></div></div>
+    <div class="big"><div class="example-label">ตัวอย่าง Chunk</div><p>Chunk A: วิธีเปลี่ยนหัว Nozzle</p><p>Chunk B: วิธีแก้ First Layer ไม่ติด</p><p style="margin-bottom:0">Chunk C: วิธีทำความสะอาด Build Plate</p></div>
+  </div><div class="footer-note">Chunk = หน่วยข้อความที่เราจะเก็บ ค้น และส่งเป็น Context</div><div class="slide-no">07</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Chunk Size</div><h2>Chunk เล็ก/ใหญ่เกินไป มีผลอย่างไร?</h2>
+  <div class="grid3">
+    <div class="card"><strong class="orange">เล็กเกินไป</strong><p>เจอคำตรง แต่บริบทขาด เช่น รู้ว่า “220°C” แต่ไม่รู้ว่าใช้กับวัสดุอะไร</p></div>
+    <div class="card"><strong class="green">พอดี</strong><p>หนึ่ง Chunk มีใจความครบพอให้ตอบคำถามหนึ่งประเด็น</p></div>
+    <div class="card"><strong class="pink">ใหญ่เกินไป</strong><p>ปนหลายเรื่อง ค้นไม่คม และกิน Context Window มากขึ้น</p></div>
+  </div>
+  <div class="callout" style="margin-top:22px"><b>เทคนิค:</b> เริ่มจาก 300–800 tokens แล้วทดสอบกับเอกสารจริง ไม่มีกฎตายตัว</div><div class="slide-no">08</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Chunk Overlap</div><h2>Overlap = ให้บัตรคำ “เหลื่อมกัน” เล็กน้อย</h2>
+  <div class="big" style="padding:28px">
+    <div style="height:48px;background:rgba(139,92,246,.23);border:1px solid rgba(139,92,246,.5);border-radius:12px;width:62%;padding:12px 15px;font-weight:850">Chunk 1: …วิธีเปลี่ยน Nozzle และข้อควรระวัง</div>
+    <div style="height:48px;background:rgba(34,211,238,.18);border:1px solid rgba(34,211,238,.5);border-radius:12px;width:62%;padding:12px 15px;font-weight:850;margin-left:34%;margin-top:-8px">Chunk 2: ข้อควรระวัง + การทดสอบหลังเปลี่ยน</div>
+  </div>
+  <p class="lead" style="margin-top:22px">เหมือนถ่ายรูปพาโนรามา: <b>แต่ละภาพต้องทับกันนิดหนึ่ง</b> เพื่อไม่ให้ข้อมูลตรงรอยต่อหายไป</p><div class="slide-no">09</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Embedding · Key Concept</div><h2>Embedding = “เครื่องสร้างพิกัดความหมาย”</h2>
+  <div class="compare">
+    <div class="side"><h3>ข้อความเข้า</h3><p style="font-size:28px">“รถยนต์”</p><p style="font-size:28px">“automobile”</p><p style="font-size:28px">“กล้วยทอด”</p></div>
+    <div class="side good"><h3>Embedding Model แปลงเป็น</h3><p class="code">รถยนต์    → [ 0.12, -0.44, 0.91, ... ]\nautomobile → [ 0.11, -0.42, 0.89, ... ]\nกล้วยทอด   → [-0.72,  0.18,-0.05, ... ]</p></div>
+  </div>
+  <div class="callout" style="margin-top:18px"><b>เปรียบเทียบ:</b> Embedding เหมือน “เครื่อง GPS ที่อ่านชื่อสถานที่แล้วคำนวณพิกัดให้”</div><div class="slide-no">10</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Vector</div><h2>Vector = “พิกัด” ที่ Embedding สร้างออกมา</h2>
+  <div class="grid2">
+    <div><p class="quote">Embedding คือ <em>กระบวนการหา GPS</em><br>Vector คือ <em>ค่าพิกัดที่ได้</em></p><p class="small">ในงานจริง Vector อาจมีหลายร้อยหรือหลายพันมิติ จึงไม่ใช่แค่ latitude / longitude 2 ค่า</p></div>
+    <div class="big"><div class="example-label">เปรียบเทียบ</div><p>📍 “สยาม” → Lat/Long</p><p>🧠 “วิธีแก้ Nozzle อุดตัน” → Vector</p><p style="margin-bottom:0">ทั้งสองอย่างคือ <b>พิกัด</b> แต่คนละชนิดของแผนที่</p></div>
+  </div><div class="slide-no">11</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Vector Space</div><h2>Vector Space = “แผนที่ของความหมาย”</h2>
+  <div class="grid2">
+    <div class="map"><div class="dot d1" data-label="รถยนต์"></div><div class="dot d2" data-label="รถ"></div><div class="dot d3" data-label="automobile"></div><div class="dot d4" data-label="กล้วยทอด"></div><div class="dot d5" data-label="คอมพิวเตอร์"></div><div class="dot d6" data-label="อาหาร"></div></div>
+    <div><p class="lead">คำที่ความหมายคล้ายกันจะถูกวางไว้ <b class="accent">ใกล้กัน</b></p><div class="metric"><b>รถยนต์ ↔ automobile</b><span class="score">ใกล้</span></div><div class="metric"><b>รถยนต์ ↔ รถ</b><span class="score">ใกล้</span></div><div class="metric"><b>รถยนต์ ↔ กล้วยทอด</b><span style="color:#fda4af;font-weight:900">ไกล</span></div><p class="small" style="margin-top:16px">ภาพนี้เป็นการย่อให้เหลือ 2 มิติเพื่อสอนแนวคิด</p></div>
+  </div><div class="slide-no">12</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Vector Database</div><h2>Vector Database = “GPS Search ของแผนที่ความหมาย”</h2>
+  <div class="gps">
+    <div class="gps-screen"><div class="road"></div><div class="pin"></div><div class="pin pin2"></div><div class="route"></div></div>
+    <div><p class="lead">GPS ไม่ได้แค่เก็บพิกัด — มันช่วย <b>ค้นสถานที่ใกล้เคียง</b></p><div class="card"><strong>Vector DB ก็เหมือนกัน</strong><p>เก็บ Vector + ข้อความ + Metadata แล้วค้นว่า “Vector ไหนอยู่ใกล้คำถามที่สุด”</p></div><div style="margin-top:12px"><span class="pill">Chroma</span><span class="pill">FAISS</span><span class="pill">Qdrant</span><span class="pill">Pinecone</span></div></div>
+  </div><div class="slide-no">13</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Similarity</div><h2>Similarity = วัดว่า “พิกัดสองจุดใกล้กันแค่ไหน”</h2>
+  <div class="grid2">
+    <div class="big"><div class="example-label">คำถาม</div><p style="font-size:27px">“หัวพิมพ์ตันต้องทำยังไง?”</p><div class="arr">↓</div><p class="small">แปลงเป็น Vector ของคำถาม</p></div>
+    <div><div class="metric"><b>Chunk: วิธีแก้ Nozzle อุดตัน</b><span class="score">0.94</span></div><div class="metric"><b>Chunk: วิธีเปลี่ยน Nozzle</b><span class="score">0.81</span></div><div class="metric"><b>Chunk: วิธีตั้งค่า Wi-Fi</b><span style="color:#fda4af;font-weight:900">0.22</span></div><p class="small">ตัวเลขเป็นตัวอย่างเพื่อสอนแนวคิด คะแนนจริงขึ้นอยู่กับวิธีวัดและระบบที่ใช้</p></div>
+  </div><div class="slide-no">14</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Semantic Search</div><h2>Keyword Search vs Semantic Search</h2>
+  <div class="compare">
+    <div class="side"><h3>🔤 Keyword Search</h3><p>มองหาคำที่ตรงกัน</p><div class="big"><p><b>ถาม:</b> “หัวพิมพ์ตัน”</p><p><b>เอกสาร:</b> “Nozzle อุดตัน”</p><p class="pink" style="margin:0">อาจพลาด ถ้าคำไม่ตรง</p></div></div>
+    <div class="side good"><h3>🧠 Semantic Search</h3><p>มองหาความหมายที่ใกล้กัน</p><div class="big"><p><b>ถาม:</b> “หัวพิมพ์ตัน”</p><p><b>เอกสาร:</b> “Nozzle อุดตัน”</p><p class="green" style="margin:0">มีโอกาสหาเจอ เพราะความหมายใกล้กัน</p></div></div>
+  </div><div class="slide-no">15</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Query Time</div><h2>เมื่อผู้ใช้ถาม ระบบทำอะไรทีละขั้น?</h2>
+  <div class="step"><div class="num">1</div><div><h3>รับคำถาม</h3><p>“Nozzle อุดตันแก้อย่างไร?”</p></div></div>
+  <div class="step"><div class="num">2</div><div><h3>สร้าง Query Embedding</h3><p>เปลี่ยนคำถามเป็น Vector</p></div></div>
+  <div class="step"><div class="num">3</div><div><h3>Vector Search</h3><p>หา Chunk ที่พิกัดใกล้ที่สุด</p></div></div>
+  <div class="step"><div class="num">4</div><div><h3>ส่ง Context ให้ LLM</h3><p>LLM อ่านเฉพาะข้อมูลที่เกี่ยวข้อง แล้วตอบ</p></div></div><div class="slide-no">16</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Retrieval</div><h2>Retrieval = “บรรณารักษ์หยิบหน้าที่เกี่ยวข้อง”</h2>
+  <div class="grid2">
+    <div><p class="lead">หน้าที่ของ Retrieval ไม่ใช่ตอบคำถาม แต่คือ <b>หา Context ที่ดีที่สุด</b> ให้ LLM</p><div class="callout">RAG เก่งแค่ไหน ขึ้นกับว่า “หยิบข้อมูลถูกชิ้นไหม” มากพอ ๆ กับความเก่งของ LLM</div></div>
+    <div class="big"><div class="example-label">Top-k = 3</div><p>① วิธีแก้ Nozzle อุดตัน</p><p>② วิธีถอด Hotend</p><p style="margin-bottom:0">③ การทำความสะอาด Filament Path</p></div>
+  </div><div class="slide-no">17</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Context</div><h2>Context = “โพย” ที่เรายื่นให้ LLM ก่อนตอบ</h2>
+  <div class="code"><span class="k">SYSTEM:</span> ตอบจากข้อมูล CONTEXT เท่านั้น\n\n<span class="k">CONTEXT:</span>\n- คู่มือหน้า 42: หาก Nozzle อุดตัน...\n- คู่มือหน้า 43: ก่อนถอด Hotend ให้...\n\n<span class="k">QUESTION:</span>\n<span class="s">Nozzle อุดตันแก้อย่างไร?</span></div>
+  <div class="grid3" style="margin-top:18px"><div class="card"><strong>Context ดี</strong><p>คำตอบมีหลักฐาน</p></div><div class="card"><strong>Context ไม่ตรง</strong><p>LLM ก็มีโอกาสตอบไม่ตรง</p></div><div class="card"><strong>Context เยอะเกิน</strong><p>เปลือง Token และอาจรบกวนคำตอบ</p></div></div><div class="slide-no">18</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Generation</div><h2>Generation = LLM “อ่านโพยแล้วเรียบเรียงคำตอบ”</h2>
+  <div class="flow" style="margin-top:26px"><div class="node">Question</div><div class="arr">+</div><div class="node hot">Retrieved Context</div><div class="arr">→</div><div class="node cyan">LLM</div><div class="arr">→</div><div class="node">Answer</div></div>
+  <div class="big" style="margin-top:32px"><div class="example-label">สำคัญ</div><p class="quote" style="font-size:30px;margin:0">RAG <em>ไม่ได้สอนโมเดลใหม่</em> — เราแค่ส่งข้อมูลที่จำเป็นให้มันอ่าน “ตอนตอบ”</p></div><div class="slide-no">19</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Prompt</div><h2>Prompt ที่ดีช่วย “ล็อกกติกา” การตอบ</h2>
+  <div class="grid2">
+    <div class="code"><span class="k">บทบาท:</span> คุณคือผู้ช่วยตอบคู่มือ 3D Printer\n\n<span class="k">กฎ:</span>\n1. ตอบจาก CONTEXT เท่านั้น\n2. ถ้าไม่พบข้อมูล ให้บอกว่าไม่พบ\n3. ห้ามเดา\n4. ระบุหน้าเอกสารเมื่อมีข้อมูล</div>
+    <div><div class="term"><div class="icon">🎭</div><div><h3>Role</h3><p>ให้รู้ว่ากำลังทำหน้าที่อะไร</p></div></div><div class="term" style="margin-top:18px"><div class="icon">📏</div><div><h3>Rules</h3><p>กำหนดว่าจะตอบอย่างไร/ห้ามทำอะไร</p></div></div><div class="term" style="margin-top:18px"><div class="icon">🧾</div><div><h3>Output</h3><p>กำหนดรูปแบบคำตอบ เช่น ขั้นตอน + แหล่งอ้างอิง</p></div></div></div>
+  </div><div class="slide-no">20</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Python Workflow</div><h2>Python เป็น “ผู้จัดการ” ที่ต่อทุกชิ้นเข้าด้วยกัน</h2>
+  <div class="flow" style="margin:20px 0 26px"><div class="node">อ่าน PDF</div><div class="arr">→</div><div class="node">Chunk</div><div class="arr">→</div><div class="node hot">Embed</div><div class="arr">→</div><div class="node">Store</div></div>
+  <div class="flow"><div class="node">input()</div><div class="arr">→</div><div class="node hot">Query Embed</div><div class="arr">→</div><div class="node">Search</div><div class="arr">→</div><div class="node">Prompt</div><div class="arr">→</div><div class="node cyan">LLM</div></div>
+  <div class="callout" style="margin-top:28px">สำหรับ Beginner: เขียนเป็นไฟล์เดียวให้ Flow ทำงานก่อน แล้วค่อยแยกเป็น modules</div><div class="slide-no">21</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Python Libraries</div><h2>แต่ละ Library รับบทเป็นใคร?</h2>
+  <div class="grid3">
+    <div class="card"><strong>📖 pypdf</strong><p>คนอ่านเอกสาร PDF แล้วดึงข้อความออกมา</p></div>
+    <div class="card"><strong>🧠 Sentence Transformers / Ollama</strong><p>เครื่องสร้าง Embedding หรือเรียกโมเดล</p></div>
+    <div class="card"><strong>🗺️ Chroma / FAISS</strong><p>GPS Search ของ Vector</p></div>
+    <div class="card"><strong>🤖 Ollama / API</strong><p>LLM ที่เรียบเรียงคำตอบ</p></div>
+    <div class="card"><strong>🔗 LangChain</strong><p>ตัวช่วยประกอบ Workflow หลายส่วน</p></div>
+    <div class="card"><strong>🧰 LlamaIndex</strong><p>Framework ที่เน้นงานข้อมูล + RAG</p></div>
+  </div><div class="footer-note">ไม่จำเป็นต้องใช้ทุกตัวพร้อมกัน — เริ่มจาก Stack ที่เล็กที่สุด</div><div class="slide-no">22</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">One-file RAG</div><h2>โปรเจกต์แรก: <span class="accent">rag.py ไฟล์เดียว</span></h2>
+  <div class="code"><span class="c"># ภาพรวม ไม่ใช่โค้ดเต็ม</span>\ntext = read_pdf(<span class="s">"manual.pdf"</span>)\nchunks = split_text(text)\nvectors = embed(chunks)\nstore(vectors, chunks)\n\nquestion = input(<span class="s">"ถาม: "</span>)\nq_vector = embed(question)\ncontext = search(q_vector, top_k=3)\nprompt = build_prompt(context, question)\nanswer = ask_llm(prompt)\nprint(answer)</div>
+  <p class="lead" style="margin-top:18px">เห็นไหมว่า RAG จริง ๆ คือ <b>Pipeline</b> ของงานเล็ก ๆ ต่อกัน</p><div class="slide-no">23</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">RAG vs Fine-tuning vs Agent</div><h2>3 อย่างนี้ไม่ใช่เรื่องเดียวกัน</h2>
+  <div class="grid3">
+    <div class="card"><strong class="cyan">RAG</strong><p>“เปิดหนังสือก่อนตอบ” เหมาะกับความรู้ที่เปลี่ยนได้และเอกสารของเรา</p></div>
+    <div class="card"><strong class="orange">Fine-tuning</strong><p>“ฝึกพฤติกรรม/รูปแบบเพิ่ม” ปรับโมเดลด้วยตัวอย่าง ไม่ใช่ฐานข้อมูลค้นเอกสาร</p></div>
+    <div class="card"><strong class="violet">Agent</strong><p>“ผู้จัดการที่เลือกเครื่องมือ” อาจเลือก RAG, Web, API หรือ Database ตามโจทย์</p></div>
+  </div>
+  <div class="flow" style="margin-top:26px"><div class="node hot">Hermes Agent</div><div class="arr">→</div><div class="node">RAG Tool</div><div class="node">Web Tool</div><div class="node">API Tool</div><div class="node">DB Tool</div></div><div class="slide-no">24</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Recap · 60 Seconds</div><h2>จำภาพนี้ให้ได้ แล้ว RAG จะไม่งงอีก</h2>
+  <div class="grid4">
+    <div class="card"><strong>📚 Document</strong><p>หนังสือ</p></div>
+    <div class="card"><strong>✂️ Chunk</strong><p>บัตรคำ</p></div>
+    <div class="card"><strong>🧭 Embedding</strong><p>เครื่องสร้างพิกัด</p></div>
+    <div class="card"><strong>📍 Vector</strong><p>พิกัดความหมาย</p></div>
+    <div class="card"><strong>🗺️ Vector Space</strong><p>แผนที่ความหมาย</p></div>
+    <div class="card"><strong>🚗 Vector DB</strong><p>GPS Search</p></div>
+    <div class="card"><strong>📖 Retrieval</strong><p>หยิบหน้าที่ใช่</p></div>
+    <div class="card"><strong>🤖 LLM</strong><p>อ่านแล้วตอบ</p></div>
+  </div>
+  <p class="quote" style="font-size:29px;margin-top:18px">สูตรจำ: <em>ค้นให้เจอ → ส่งข้อมูลที่ใช่ → แล้วค่อยให้ AI ตอบ</em></p><div class="slide-no">25</div>
+</section>
+
+  </main>
+  <footer class="controls">
+    <button class="btn" id="prev">← ก่อนหน้า</button>
+    <div class="progress"><div id="bar" class="bar"></div></div>
+    <button class="btn primary" id="next">ถัดไป →</button>
+    <span class="tiny"><span class="kbd">←</span> <span class="kbd">→</span> / Space · <span class="kbd">F</span> Fullscreen</span>
+  </footer>
+</div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+slides.forEach((s,i)=>{const n=s.querySelector('.slide-no'); if(n) n.textContent=String(i+1).padStart(2,'0');});
+let index=0; const cur=document.getElementById('cur'),tot=document.getElementById('tot'),bar=document.getElementById('bar');
+tot.textContent=slides.length;
+function render(push=true){slides.forEach((s,i)=>s.classList.toggle('active',i===index));cur.textContent=index+1;bar.style.width=((index+1)/slides.length*100)+'%';document.getElementById('prev').disabled=index===0;document.getElementById('next').textContent=index===slides.length-1?'จบ ✓':'ถัดไป →';if(push)location.hash='slide-'+(index+1)}
+function next(){if(index<slides.length-1){index++;render()}}
+function prev(){if(index>0){index--;render()}}
+function loadHash(){const m=location.hash.match(/slide-(\d+)/);if(m){index=Math.max(0,Math.min(slides.length-1,Number(m[1])-1));render(false)}}
+document.getElementById('next').onclick=next;document.getElementById('prev').onclick=prev;
+document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();next()}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}if(e.key==='Home'){index=0;render()}if(e.key==='End'){index=slides.length-1;render()}if(e.key.toLowerCase()==='f'){document.documentElement.requestFullscreen?.()}});
+window.addEventListener('hashchange',loadHash);loadHash();render(false);
+</script>
+</body>
+</html>
